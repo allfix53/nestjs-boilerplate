@@ -8,6 +8,7 @@ import {
   Patch,
   Query,
   UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
@@ -21,6 +22,8 @@ import { TasksService } from './tasks.service';
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
+  private logger = new Logger('TaskController');
+
   constructor(private taskService: TasksService) {}
 
   @Get('/')
@@ -29,6 +32,7 @@ export class TasksController {
     // customer decorator @GetUser to get user from auth header
     @GetUser() user: User,
   ): Promise<Task[]> {
+    this.logger.verbose(`User ${user.username} retrieving all the tasks. `);
     return this.taskService.getTasks(filterDto, user);
   }
 
@@ -38,6 +42,9 @@ export class TasksController {
     // customer decorator @GetUser to get user from auth header
     @GetUser() user: User,
   ): Promise<Task> {
+    this.logger.verbose(
+      `User ${user.username} get task by id ${id} all the tasks. `,
+    );
     return this.taskService.getTaskById(id, user);
   }
 
